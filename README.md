@@ -30,7 +30,7 @@ It will copy all the configuration files and the transitive dependencies (webpac
 
 ---
 
-# Step By Step (Building the App)
+## Config/ Libs
 
 ## EditorConfg, ESLint & Prettier
 
