@@ -135,3 +135,8 @@ Allow navigation between pages. \
 - Add the VSCode Plugin: **vscode-styled-components
 jpoissonnier.vscode-styled-components**<br>
 Syntax highlighting and Intellisense for styled-components.
+
+### Icons
+`yarn add react-icons`
+
+Lib with most famous icons.
