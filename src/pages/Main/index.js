@@ -1,15 +1,36 @@
 import React, { Component } from 'react';
-
-import { FaGithubAlt, FaPlus } from 'react-icons/fa';
+import { FaGithubAlt, FaPlus, FaSpinner } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
-import { Container, Form, SubmitButton } from './styles';
+import Container from '../../components/Container';
+import { Form, SubmitButton, List } from './styles';
 
 export default class Main extends Component {
   state = {
     newRepo: '',
+    repositories: [],
+    loading: false,
   };
+
+  // Load data from Local Storage
+  componentDidMount() {
+    const repositories = localStorage.getItem('repositories');
+
+    if (repositories) {
+      this.setState({ repositories: JSON.parse(repositories) });
+    }
+  }
+
+  // Save data from localStorage
+  componentDidUpdate(prevProp, prevState) {
+    const { repositories } = this.state;
+
+    if (prevState.repositories !== repositories) {
+      localStorage.setItem('repositories', JSON.stringify(repositories));
+    }
+  }
 
   handleInputChange = (e) => {
     this.setState({ newRepo: e.target.value });
@@ -18,15 +39,25 @@ export default class Main extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { newRepo } = this.state;
+    this.setState({ loading: true });
+
+    const { newRepo, repositories } = this.state;
 
     const response = await api.get(`/repos/${newRepo}`);
 
-    console.log(response.data);
+    const data = {
+      name: response.data.full_name,
+    };
+
+    this.setState({
+      repositories: [...repositories, data],
+      newRepo: '',
+      loading: false,
+    });
   };
 
   render() {
-    const { newRepo } = this.state;
+    const { newRepo, repositories, loading } = this.state;
     return (
       <Container>
         <h1>
@@ -42,10 +73,24 @@ export default class Main extends Component {
             onChange={this.handleInputChange}
           />
 
-          <SubmitButton>
-            <FaPlus color="#FFF" size={14} />
+          <SubmitButton loading={loading}>
+            {loading ? (
+              <FaSpinner color="#FFF" size={14} />
+            ) : (
+              <FaPlus color="#FFF" size={14} />
+            )}
           </SubmitButton>
         </Form>
+        <List>
+          {repositories.map((repository) => (
+            <li key={repository.name}>
+              <span>{repository.name}</span>
+              <Link to={`/repository/${encodeURIComponent(repository.name)}`}>
+                Details
+              </Link>
+            </li>
+          ))}
+        </List>
       </Container>
     );
   }
